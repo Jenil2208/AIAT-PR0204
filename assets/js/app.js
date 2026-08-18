@@ -4,7 +4,7 @@ const resume = {
   role: 'Frontend Developer',
   summary: 'Creative frontend developer building accessible, responsive interfaces.',
   contact: {
-    email: 'you@example.com',
+    email: 'jenilpatel228@gmail.com',
     phone: '(123) 456-7890',
     location: 'City, Country',
     website: 'https://example.com'
