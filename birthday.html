@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Happy Birthday!</title>
+  <style>
+    html,body{height:100%;margin:0;font-family:system-ui,Arial;background:#0f172a;color:#fff}
+    .wrap{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px}
+    h1{font-size:clamp(28px,6vw,64px);margin:8px}
+    p{margin:6px;color:#cbd5e1}
+    button{background:#ef4444;border:none;color:white;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer}
+    canvas{position:fixed;inset:0;pointer-events:none}
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="wrap">
+    <h1 id="msg">Happy Birthday!</h1>
+    <p id="sub">Wishing you a wonderful day.</p>
+    <div style="margin-top:12px">
+      <input id="name" placeholder="Enter name (optional)" style="padding:8px;border-radius:8px;border:1px solid #334155;background:transparent;color:#fff"> 
+      <button id="go">Celebrate</button>
+    </div>
+  </div>
+
+  <script>
+    // Simple confetti canvas
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let W=canvas.width=innerWidth, H=canvas.height=innerHeight;
+    addEventListener('resize',()=>{W=canvas.width=innerWidth;H=canvas.height=innerHeight});
+
+    function rand(min,max){return Math.random()*(max-min)+min}
+    class Particle{constructor(){this.reset()}reset(){this.x=rand(0,W);this.y=rand(-H,0);this.w=rand(6,12);this.h=rand(8,18);this.vx=rand(-2,2);this.vy=rand(2,6);this.rot=rand(0,360);this.vr=rand(-8,8);this.color=['#f97316','#f43f5e','#60a5fa','#34d399','#facc15'][~~rand(0,5)]}}
+    const parts=[]; for(let i=0;i<150;i++)parts.push(new Particle());
+
+    function update(){ctx.clearRect(0,0,W,H);for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.vy+=0.02; if(p.y>H+20) p.reset();ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore()}requestAnimationFrame(update)}
+
+    let running=false;
+    function startConfetti(){if(!running){running=true;update();setTimeout(()=>{running=false},6000)}}
+
+    // Interactions
+    document.getElementById('go').addEventListener('click',()=>{
+      const name = document.getElementById('name').value.trim();
+      const msg = name?`Happy Birthday, ${name}!`:'Happy Birthday!';
+      document.getElementById('msg').textContent = msg;
+      document.getElementById('sub').textContent = 'Wishing you a wonderful day.';
+      startConfetti();
+    });
+
+    // Auto celebrate on load briefly
+    window.addEventListener('load', ()=>{setTimeout(()=>{startConfetti()},400)});
+  </script>
+</body>
+</html>
