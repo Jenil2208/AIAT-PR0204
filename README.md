@@ -21,3 +21,4 @@ Edit the `$products` array at the top of `index.php` to customize the menu, pric
 The page expects PHP to be installed. The browser interactions are in `assets/js/app.js`, and the visual design is in `assets/css/style.css`.
 
 
+
