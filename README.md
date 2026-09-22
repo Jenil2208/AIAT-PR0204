@@ -1,6 +1,6 @@
-# PHP Frontend Resume Site
+# Crumb & Butter Bakery
 
-Minimal, editable PHP resume template.
+A small-batch bakery storefront built with PHP, HTML, CSS and vanilla JavaScript. The PHP page owns the product catalogue, while JavaScript adds category filtering and a shopping bag interaction.
 
 Run locally using PHP built-in server:
 
@@ -16,24 +16,7 @@ Files added:
 - [index.php](index.php) — main template
 - [assets/css/style.css](assets/css/style.css) — styles
 
-Edit the `$resume` array at the top of `index.php` to customize content.
+Edit the `$products` array at the top of `index.php` to customize the menu, prices and product images.
 
-HTML + JavaScript version
--------------------------
-
-An alternate static version is provided that uses plain HTML and client-side JavaScript.
-
-- `index.html` — main static page
-- `assets/js/app.js` — resume data and renderer
-
-Run the static version locally using a simple server (recommended):
-
-```bash
-# from the project root
-php -S localhost:8000
-# or with Python 3
-python3 -m http.server 8000
-```
-
-Open http://localhost:8000/index.html in your browser. Edit `assets/js/app.js` to change content.
+The page expects PHP to be installed. The browser interactions are in `assets/js/app.js`, and the visual design is in `assets/css/style.css`.
 

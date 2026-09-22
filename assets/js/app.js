@@ -1,105 +1,49 @@
-// Resume data and simple renderer
-const resume = {
-  name: 'Jenil Patel',
-  role: 'Frontend Developer',
-  summary: 'Creative frontend developer building accessible, responsive interfaces.',
-  contact: {
-    email: 'jenilpatel228@gmail.com',
-    phone: '(123) 456-7890',
-    location: 'City, Country',
-    website: 'https://example.com'
-  },
-  experience: [
-    {
-      company: 'Acme Inc.',
-      role: 'Frontend Developer',
-      period: '2022 - Present',
-      details: [
-        'Built responsive UI components with HTML/CSS/JS',
-        'Improved performance and accessibility'
-      ]
-    }
-  ],
-  education: [
-    { school: 'University Name', degree: 'B.Sc. in Computer Science', period: '2018 - 2021' }
-  ],
-  skills: ['HTML', 'CSS', 'JavaScript', 'PHP', 'Responsive Design'],
-  projects: [ { name: 'Personal Portfolio', desc: 'A responsive portfolio site showcasing projects.', link: '#' } ]
-};
+const cart = {};
+const products = window.bakeryProducts || [];
+const money = value => `$${value.toFixed(2)}`;
 
-function el(tag, attrs = {}, text) {
-  const node = document.createElement(tag);
-  for (const k in attrs) node.setAttribute(k, attrs[k]);
-  if (text !== undefined) node.textContent = text;
-  return node;
+function renderCart() {
+  const items = Object.entries(cart).filter(([, quantity]) => quantity > 0);
+  const root = document.getElementById('cart-items');
+  const count = items.reduce((total, [, quantity]) => total + quantity, 0);
+  const total = items.reduce((sum, [id, quantity]) => sum + products.find(product => product.id === Number(id)).price * quantity, 0);
+  document.getElementById('cart-count').textContent = count;
+  document.getElementById('cart-total').textContent = money(total);
+  root.innerHTML = items.length ? items.map(([id, quantity]) => {
+    const product = products.find(item => item.id === Number(id));
+    return `<div class="cart-line"><div>${product.name}<small>${quantity} × ${money(product.price)}</small></div><button type="button" data-remove="${product.id}" aria-label="Remove ${product.name}">×</button></div>`;
+  }).join('') : '<p class="empty-cart">Your bag is waiting for something sweet.</p>';
 }
 
-function renderHeader() {
-  document.getElementById('name').textContent = resume.name;
-  document.getElementById('role').textContent = resume.role;
-  document.getElementById('summary').textContent = resume.summary;
-  const c = document.getElementById('contact');
-  c.innerHTML = '';
-  const mail = el('a', { href: `mailto:${resume.contact.email}` }, resume.contact.email);
-  c.appendChild(mail);
-  c.appendChild(document.createTextNode(' · ' + resume.contact.location + ' · '));
-  const web = el('a', { href: resume.contact.website, target: '_blank' }, 'Website');
-  c.appendChild(web);
+function setDrawer(isOpen) {
+  document.getElementById('cart-drawer').classList.toggle('open', isOpen);
+  document.querySelector('.drawer-backdrop').classList.toggle('open', isOpen);
+  document.getElementById('cart-drawer').setAttribute('aria-hidden', String(!isOpen));
 }
 
-function renderExperience() {
-  const root = document.getElementById('experience');
-  root.innerHTML = '';
-  resume.experience.forEach(exp => {
-    const card = el('article', { class: 'card' });
-    const h = el('h3', {}, `${exp.role} `);
-    const span = el('span', { class: 'muted' }, '@ ' + exp.company);
-    h.appendChild(span);
-    card.appendChild(h);
-    card.appendChild(el('p', { class: 'period' }, exp.period));
-    const ul = el('ul');
-    exp.details.forEach(d => ul.appendChild(el('li', {}, d)));
-    card.appendChild(ul);
-    root.appendChild(card);
-  });
-}
-
-function renderProjects() {
-  const root = document.getElementById('projects');
-  root.innerHTML = '';
-  resume.projects.forEach(p => {
-    const card = el('div', { class: 'card' });
-    card.appendChild(el('h3', {}, p.name));
-    card.appendChild(el('p', {}, p.desc));
-    if (p.link) card.appendChild(el('p', {}, '')).appendChild(el('a', { href: p.link }, 'View'));
-    root.appendChild(card);
-  });
-}
-
-function renderSkills() {
-  document.getElementById('skills').textContent = resume.skills.join(' · ');
-}
-
-function renderEducation() {
-  const root = document.getElementById('education');
-  root.innerHTML = '';
-  resume.education.forEach(e => {
-    const card = el('div', { class: 'card' });
-    card.appendChild(el('h3', {}, e.degree));
-    card.appendChild(el('p', { class: 'muted' }, `${e.school} · ${e.period}`));
-    root.appendChild(card);
-  });
-}
-
-function renderCopyright() {
-  document.getElementById('copyright').textContent = `© ${new Date().getFullYear()} ${resume.name}.`;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  renderHeader();
-  renderExperience();
-  renderProjects();
-  renderSkills();
-  renderEducation();
-  renderCopyright();
+document.addEventListener('click', event => {
+  const addButton = event.target.closest('[data-add]');
+  const removeButton = event.target.closest('[data-remove]');
+  if (addButton) {
+    const id = addButton.dataset.add;
+    cart[id] = (cart[id] || 0) + 1;
+    renderCart();
+    setDrawer(true);
+  }
+  if (removeButton) {
+    const id = removeButton.dataset.remove;
+    cart[id] -= 1;
+    renderCart();
+  }
+  if (event.target.closest('[data-cart-open]')) setDrawer(true);
+  if (event.target.closest('[data-cart-close]')) setDrawer(false);
+  if (event.target.closest('.checkout-button')) alert('Thanks! Checkout is ready for your order.');
+  const categoryButton = event.target.closest('[data-category]');
+  if (categoryButton) {
+    document.querySelectorAll('.category-tab').forEach(button => button.classList.remove('active'));
+    categoryButton.classList.add('active');
+    document.querySelectorAll('.product-card').forEach(card => { card.hidden = categoryButton.dataset.category !== 'all' && card.dataset.category !== categoryButton.dataset.category; });
+  }
 });
+
+renderCart();
